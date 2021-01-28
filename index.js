@@ -1,7 +1,6 @@
 const express = require("express")
 const { indexOf } = require("methods")
 const connectDB = require('./config/db')
-const { check, validationResult } = require('express-validator/check')
 let app = express()
 
 // Connect database
