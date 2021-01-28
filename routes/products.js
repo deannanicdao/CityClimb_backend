@@ -1,34 +1,19 @@
 const express = require("express")
 const router = express.Router()
-const ProductModel = require("../models/Product.js")
+const Product = require("../models/Product.js")
 const { check, validationResult } = require('express-validator')
 
-
-const products = [
-    {
-            id: 1,
-            name: "item 1",
-            description: "description 1", 
-            price: 10
-    },
-    {
-            id: 2,
-            name: "item 2",
-            description: "description 2", 
-            price: 15
-    },
-    {
-            id: 3,
-            name: "item 3",
-            description: "description 3", 
-            price: 12.5
+router.get("/", async (request, response) => {
+    try {
+        let products = await Product.find()
+        if (products) {
+            response.send(products)
+        }
+    } catch (err) {
+        console.error(err.message)
+        response.status(500).send('Server error')
     }
-]
-
-
-
-router.get("/", (request, response) => {
-    response.send(products)
+    
 })
 
 router.get("/:id", (request, response) => {
@@ -45,7 +30,7 @@ router.post("/", [
 ], async (request, response) => 
     {
         let errors = validationResult(request)
-        if(!errors.isEmpty()) {
+        if (!errors.isEmpty()) {
             return response.status(400).json({ errors: errors.array() })
         }
         
@@ -71,15 +56,6 @@ router.post("/", [
             console.error(err.message)
             response.status(500).send('Server error')
         }
-
-
-        // let product = request.body
-        // // response.sendStatus(200)
-        // console.log(product)
-        // // products.push(product)
-
-        // // Insert product into database
-        // response.send(products)
     }
 )
 
