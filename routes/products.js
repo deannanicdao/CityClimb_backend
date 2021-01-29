@@ -59,7 +59,7 @@ router.post("/", [
 
             await product.save()
 
-            response.send('Product added.')
+            response.status(201).send(product)
         } catch (err) {
             console.error(err.message)
             response.status(500).send('Server error')
