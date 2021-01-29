@@ -5,16 +5,16 @@ const ClimbSchema = new mongoose.Schema({
     gym: {
         type: String,
         enum: ['milton', 'newstead', 'west end'],
-        require: true
+        required: true
     },
     wall: {
         type: String,
-        require: true
+        required: true
     },
     colour: {
         type: String,
         enum: ['black', 'blue', 'green', 'orange', 'purple', 'red', 'white', 'yellow'],
-        require: true
+        required: true
     },
     setBy: {
         type: User,
@@ -29,7 +29,8 @@ const ClimbSchema = new mongoose.Schema({
         required: false 
     },
     image: {
-        type: String
+        Data: Buffer,
+        ContentType: String, 
     },
     video: {
         type: String
