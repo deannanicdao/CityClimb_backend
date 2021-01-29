@@ -2,6 +2,7 @@ const express = require("express")
 const router = express.Router()
 const Product = require("../models/Product.js")
 const { check, validationResult } = require('express-validator')
+const { Router } = require("express")
 
 router.get("/", async (request, response) => {
     try {
@@ -141,6 +142,34 @@ router.post("/", [
 //     response.send(product)
 // })
 
+// UPDATE
+// Replace
+router.put("/:id", (request, response) => {
+    Product.findOneAndReplace({ _id: request.params.id }, request.body)
+    .then(document => response.send(document))
+    .catch(error => response.send(error))
+})
+
+// router.get("/:id", async (request, response) => {
+//     try {
+//         let product = await Product.findById(request.params.id)
+//         if (product) {
+//             response.send(product)
+//         }
+//     } catch (err) {
+//         console.error(err.message)
+//         response.status(500).send('Server error')
+//     }
+   
+// })
+
+// Update existing fields
+router.patch("/:id", (request, response) => {
+    Product.findByIdAndUpdate(request.params.id, request.body)
+        .then(document => response.send(document))
+        .catch(error => response.send(error))
+})
+
 // DELETE
 router.delete("/:id", (request, response) => {
     // let index = products.findByIdAndDelete(el => el.id == request.params.id)
@@ -152,6 +181,7 @@ router.delete("/:id", (request, response) => {
     // }
     Product.findByIdAndDelete(request.params.id)
         .then(confirmation => response.send(console.log(confirmation)))
+        // TODO: Returns the deleted object - change this to return status
 		.catch(error => response.send(error))
 })
 
