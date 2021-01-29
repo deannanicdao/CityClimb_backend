@@ -16,9 +16,17 @@ router.get("/", async (request, response) => {
     
 })
 
-router.get("/:id", (request, response) => {
-    let product = products.find(el => el.id == request.params.id)
-    response.send(product)
+router.get("/:id", async (request, response) => {
+    try {
+        let product = await Product.findById(request.params.id)
+        if (product) {
+            response.send(product)
+        }
+    } catch (err) {
+        console.error(err.message)
+        response.status(500).send('Server error')
+    }
+   
 })
 
 
