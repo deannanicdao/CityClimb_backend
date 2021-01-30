@@ -1,5 +1,8 @@
-const mongoose = require("mongoose")
-const User = require("./User")
+// const mongoose = require("mongoose")
+// const User = require("./User")
+
+import mongoose from 'mongoose'
+import User from './User.js'
 
 const ClimbSchema = new mongoose.Schema({
     gym: {
@@ -18,7 +21,6 @@ const ClimbSchema = new mongoose.Schema({
     },
     setBy: {
         type: User,
-        required: true,
     },
     createdDate: {
         type: Date,
@@ -38,4 +40,6 @@ const ClimbSchema = new mongoose.Schema({
 })
 
 
-module.exports = Climb = mongoose.model('Climb', ClimbSchema)
+// module.exports = Climb = mongoose.model('Climb', ClimbSchema)
+
+export default  mongoose.model('Climb', ClimbSchema)

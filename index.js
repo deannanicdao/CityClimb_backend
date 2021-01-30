@@ -1,6 +1,11 @@
-const express = require("express")
-const { indexOf } = require("methods")
-const connectDB = require('./config/db')
+// const express = require("express")
+// const { indexOf } = require("methods")
+// const connectDB = require('./config/db')
+
+import express from 'express'
+import { indexOf } from 'methods'
+import connectDB from './config/db' 
+
 let app = express()
 
 // Connect database

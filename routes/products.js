@@ -1,7 +1,13 @@
-const express = require("express")
+// const express = require("express")
+// const Product = require("../models/Product.js")
+// const { check, validationResult } = require('express-validator')
+
+import express from 'express'
+import Product from '../models/Product.js'
+import { check, validationResult } from 'express-validator'
+
 const router = express.Router()
-const Product = require("../models/Product.js")
-const { check, validationResult } = require('express-validator')
+
 // const { Router, response } = require("express")
 
 // GET
@@ -105,4 +111,6 @@ router.delete("/:id", (request, response) => {
 		.catch(error => response.send(error))
 })
 
-module.exports = router
+export default router 
+
+// module.exports = router

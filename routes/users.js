@@ -1,11 +1,16 @@
-const express = require('express');
-const router = express.Router();
-const User = require('./../models/User');
-const { check, validationResult } = require('express-validator');
+// const express = require('express');
+// const router = express.Router();
+// const User = require('./../models/User');
+// const { check, validationResult } = require('express-validator');
 // const gravatar = require('gravatar');
 // const bcrypt = require('bcryptjs');
 // const jwt = require('jsonwebtoken');
 // const normalize = require('normalize-url');
+
+import express from 'express'
+import User from '../models/User.js'
+import { check, validationResult } from 'express-validator'
+const router = express.Router();
 
 // GET
 // Find all users
@@ -244,4 +249,6 @@ router.delete("/:id", (request, response) => {
 //   }
 // );
 
-module.exports = router;
+// module.exports = router;
+
+export default router
