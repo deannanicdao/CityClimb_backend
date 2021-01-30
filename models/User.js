@@ -20,6 +20,10 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    // climbs: [{ 
+    //     type: mongoose.Schema.Types.ObjectId, 
+    //     ref: "Climb" 
+    // }],
     date: {
         type: Date,
         default: Date.now
@@ -27,6 +31,6 @@ const UserSchema = new mongoose.Schema({
 })
 
 
-// module.exports = User = mongoose.model('User', UserSchema)
+const User = mongoose.model('User', UserSchema)
 
-export default mongoose.model('User', UserSchema)
+export default User
