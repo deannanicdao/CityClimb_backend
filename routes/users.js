@@ -2,9 +2,9 @@ const express = require('express');
 const router = express.Router();
 const User = require('./../models/User');
 const { check, validationResult } = require('express-validator');
-// const gravatar = require('gravatar');
-// const bcrypt = require('bcryptjs');
-// const jwt = require('jsonwebtoken');
+const gravatar = require('gravatar');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 // const normalize = require('normalize-url');
 
 // GET
@@ -59,17 +59,34 @@ router.post("/", [
             let user = await User.findOne({ name })
 
             if (user) {
-                response.status(400).json({ errors: [ { msg: 'User already exists' }] })
+                return response.status(400).json({ errors: [ { msg: 'User already exists' }] })
             }
 
+            let avatar = gravatar.url(email, {
+                s: '200',
+                r: 'pg',
+                d: 'mm'
+            })
+
+            // Higher genSalt the more secure, but compromises speed
+            let salt = await bcrypt.genSalt(10) 
+
+            
             user = new User({
                 name,
                 email,
                 staffNumber,
-                password
+                password,
+                avatar
             })
+            
+            // Hash password
+            user.password = await bcrypt.hash(password, salt)
 
             await user.save()
+            
+            // TODO: Return jsonwebtoken
+            response.send('User registered')
 
             response.status(201).send(user)
         } catch (err) {
@@ -98,7 +115,7 @@ router.patch("/:id", (request, response) => {
 // Remove a user
 router.delete("/:id", (request, response) => {
     User.findByIdAndDelete(request.params.id)
-        .then(confirmation => response.send(console.log(confirmation)))
+        .then(response.send('User deleted'))
         // TODO: Returns the deleted object - change this to return status
 		.catch(error => response.send(error))
 })
