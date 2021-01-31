@@ -17,6 +17,7 @@ connectDB()
 app.use(express.json())
 app.use("/products", require("./routes/products.js"))
 app.use("/users", require("./routes/users.js"))
+app.use("/auth", require("./routes/auth.js"))
 // app.use(express.urlencoded())
 
 // GET "/"
