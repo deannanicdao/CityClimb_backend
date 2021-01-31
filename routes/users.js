@@ -106,10 +106,6 @@ router.post("/", [
                     response.json({ token }) // alternatively, can send user ID
                 }
             )
-
-            // response.send('User registered')
-
-            // response.status(201).send(user)
         } catch (err) {
             console.error(err.message)
             response.status(500).send('Server error')
