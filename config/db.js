@@ -1,7 +1,12 @@
-const mongoose = require('mongoose')
+// const mongoose = require('mongoose')
+import mongoose from 'mongoose'
+
 // config package used for global variables
-const config = require('config')
+// const config = require('config')
+import config from 'config'
 const db = config.get('mongoURI')
+
+
 
 const connectDB = async () => {
     try {
@@ -17,4 +22,5 @@ const connectDB = async () => {
     }
 }
 
-module.exports = connectDB
+export default connectDB
+// module.exports = connectDB

@@ -1,8 +1,17 @@
-const express = require("express")
-const router = express.Router()
-const Product = require("../models/Product.js")
-const { check, validationResult } = require('express-validator')
+// const express = require("express")
+// const Product = require("../models/Product.js")
+// const { check, validationResult } = require('express-validator')
 
+import express from 'express'
+import Product from '../models/Product.js'
+import { check, validationResult } from 'express-validator'
+
+const router = express.Router()
+
+// const { Router, response } = require("express")
+
+// GET
+// Find all products
 router.get("/", async (request, response) => {
     try {
         let products = await Product.find()
@@ -16,13 +25,24 @@ router.get("/", async (request, response) => {
     
 })
 
-router.get("/:id", (request, response) => {
-    let product = products.find(el => el.id == request.params.id)
-    response.send(product)
+// GET
+// Find by id
+router.get("/:id", async (request, response) => {
+    try {
+        let product = await Product.findById(request.params.id)
+        if (product) {
+            response.send(product)
+        }
+    } catch (err) {
+        console.error(err.message)
+        response.status(500).send('Server error')
+    }
+   
 })
 
 
 // CREATE
+// A single product
 router.post("/", [
     check('name', 'Name is required').not().isEmpty(),
     check('description', 'Description is required').not().isEmpty(),
@@ -39,7 +59,7 @@ router.post("/", [
         try {
             let product = await Product.findOne({ name })
 
-            if(product) {
+            if (product) {
                 response.status(400).json({ errors: [ { msg: 'Product already exists' }] })
             }
 
@@ -51,7 +71,7 @@ router.post("/", [
 
             await product.save()
 
-            response.send('Product added.')
+            response.status(201).send(product)
         } catch (err) {
             console.error(err.message)
             response.status(500).send('Server error')
@@ -59,45 +79,38 @@ router.post("/", [
     }
 )
 
+// POST
+// Search by match
+// router.post("/search", (request, response) => {
+//     Product.where('name', request.body.keyword)
+//         .then(document => response.send(document))
+//         .catch(error => response.send(error))
+// })
+
+
 // UPDATE
+// Replace
 router.put("/:id", (request, response) => {
-    let indexOfTheElement = products.findIndex(element => element.id == request.params.id)
-    let newProduct = request.body
-    products.splice(indexOfTheElement, 1, newProduct)
-    response.send(products[indexOfTheElement])
+    Product.findOneAndReplace({ _id: request.params.id }, request.body)
+    .then(document => response.send(document))
+    .catch(error => response.send(error))
 })
 
+// Update existing fields
 router.patch("/:id", (request, response) => {
-    let product = products.find(el => el.id == request.params.id)
-    
-    Object.keys(request.body).forEach(key => {
-        if (product.key) {
-            product.key == request.body[key]
-        }
-    })
-
-    if (request.body.name) {
-        product.name = request.body.name
-    }
-    if (request.body.description) {
-        product.description = request.body.description
-    }
-    if (request.body.price) {
-        product.price = request.body.price
-    }
-    
-    response.send(product)
+    Product.findByIdAndUpdate(request.params.id, request.body)
+        .then(document => response.send(document))
+        .catch(error => response.send(error))
 })
 
 // DELETE
 router.delete("/:id", (request, response) => {
-    let index = products.findIndex(el => el.id == request.params.id)
-    if (index != -1) {
-        products.splice(index, 1)
-        response.sendStatus(200)
-    } else {
-        response.sendStatus(404)
-    }
+    Product.findByIdAndDelete(request.params.id)
+        .then(confirmation => response.send(console.log(confirmation)))
+        // TODO: Returns the deleted object - change this to return status
+		.catch(error => response.send(error))
 })
 
-module.exports = router
+export default router 
+
+// module.exports = router
