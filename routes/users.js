@@ -59,7 +59,7 @@ router.post("/", [
             let user = await User.findOne({ name })
 
             if (user) {
-                response.status(400).json({ errors: [ { msg: 'user already exists' }] })
+                response.status(400).json({ errors: [ { msg: 'User already exists' }] })
             }
 
             user = new User({
