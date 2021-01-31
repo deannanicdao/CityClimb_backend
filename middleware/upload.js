@@ -8,7 +8,9 @@ const storage = multer.diskStorage({
         cb(null, './uploads/')
     },
     filename: function (req, file, cb) {
+        console.log('Inside upload')
         console.log(file)
+
         // generate unique name for each image
         cb(null, 'cityclimb' + '-' + Date.now() + path.extname(file.originalname))
     }
@@ -25,6 +27,6 @@ let upload = multer({
     fileFilter: fileFilter
 })
 
-// export upload as single file, you can use multiple
+// export upload as single file
 
 export default upload.single('climbImage')

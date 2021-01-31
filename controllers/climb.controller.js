@@ -1,16 +1,19 @@
 import Climb from '../models/Climb.js'
+import getVideoId from '../youtube_url.js'
 
 const create = (req, res) =>{
+    console.log('Inside create')
+    console.log(req.file)
 
-    const { gym, wall, colour, setter, video } = req.body
+    let { gym, wall, colour, video } = req.body
 
     const image = req.file.path
+    video = getVideoId(video)
 
     const climb = new Climb({
         gym,
         wall,
         colour,
-        setter,
         image,
         video
     })
@@ -23,7 +26,7 @@ const create = (req, res) =>{
         }
 
         return res.status(200).json({
-            message: "Created category successfully",
+            message: "Created climb successfully",
             climb
         })
     })

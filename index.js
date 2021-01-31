@@ -41,11 +41,7 @@ app.use(cors())
 app.use("/products", productRoutes)
 app.use('/climbs', climbRoutes)
 app.use("/users", userRoutes)
-app.use((req, res) => {
-    res.status(404).json({
-        errors: "page not found"
-    })
-})
+
 
 
 
@@ -59,4 +55,10 @@ app.get("/", (req, res) => {
 
 app.listen(3000, () => {
     console.log("listening to the server")
+})
+
+app.use((req, res) => {
+    res.status(404).json({
+        errors: "page not found"
+    })
 })
