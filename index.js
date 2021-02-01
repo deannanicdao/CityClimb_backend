@@ -36,6 +36,8 @@ app.use(
         extended: true
     })
 )
+
+// Input origin
 app.use(cors())
 
 app.use("/products", productRoutes)
@@ -53,7 +55,7 @@ app.get("/", (req, res) => {
     res.send("Welcome to my first web server")
 })
 
-app.listen(3000, () => {
+app.listen(8000, () => {
     console.log("listening to the server")
 })
 
