@@ -3,20 +3,27 @@ import getVideoId from '../youtube_url.js'
 
 const create = (req, res) =>{
     console.log('Inside create')
-    console.log(req.file)
+    // console.log(req.file)
+    let { gym, wall, colour, youtubeUrl } = req.body
+    console.log(gym, wall, colour, youtubeUrl)
+    console.log(req.body)
 
-    let { gym, wall, colour, video } = req.body
+    // const image = req.file.path
+    let video = getVideoId(youtubeUrl)
 
-    const image = req.file.path
-    video = getVideoId(video)
+    // try {
+        
+    // } catch (error) {
+        
+    // }
 
-    const climb = new Climb({
+    let climb = new Climb({
         gym,
         wall,
         colour,
-        image,
         video
     })
+
 
     climb.save((err, climb) => {
         if(err){
@@ -25,12 +32,29 @@ const create = (req, res) =>{
             })
         }
 
-        return res.status(200).json({
+        res.status(200).json({
             message: "Created climb successfully",
             climb
         })
     })
 
+    // Climb.create({
+    //     gym: gym,
+    //     wall: wall,
+    //     colour: colour,
+    //     // image,
+    //     video: video
+    // })
+    // .then((climb) => {
+    //     res.status(200).json({
+    //         message: "Created climb successfully",
+    //         climb
+    //     })
+    // })
+    // .catch((err) => {
+    //     res.status(400).json({
+    //         errors: err.message
+    //     })})
 }
 
 export default { 

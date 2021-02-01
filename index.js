@@ -11,6 +11,10 @@ import climbRoutes from './routes/climbs.js'
 import userRoutes from './routes/users.js'
 
 const app = express()
+app.use(cors())
+
+// Middleware
+app.use(express.json())
 
 // use uploads folder to save images
 app.use('/uploads', express.static('uploads')) 
@@ -25,20 +29,10 @@ connectDB()
 // .then(() => console.log("Connected to the database"))
 // .catch(() => console.log("There was an error connecting to the database"))
 
-// Middleware
-app.use(express.json())
 
-// app.use(express.urlencoded())
-
-app.use(bodyParser.json())
-app.use(
-    bodyParser.urlencoded({
-        extended: true
-    })
-)
 
 // Input origin
-app.use(cors())
+
 
 app.use("/products", productRoutes)
 app.use('/climbs', climbRoutes)
