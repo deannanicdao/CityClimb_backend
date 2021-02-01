@@ -16,6 +16,13 @@ app.use(cors())
 // Middleware
 app.use(express.json())
 
+app.use(bodyParser.json())
+app.use(
+    bodyParser.urlencoded({
+        extended: true
+    })
+)
+
 // use uploads folder to save images
 app.use('/uploads', express.static('uploads')) 
 
