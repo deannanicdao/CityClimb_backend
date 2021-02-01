@@ -4,6 +4,7 @@
   "main": "index.js",
   "author": "Deanna Nicdao",
   "license": "MIT",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon index.js"
@@ -11,9 +12,11 @@
   "description": "",
   "dependencies": {
     "config": "^3.3.3",
+    "cors": "^2.8.5",
     "express": "^4.17.1",
     "express-validator": "^6.9.2",
     "mongoose": "^5.11.13",
+    "multer": "^1.4.2",
     "nodemon": "^2.0.7"
   }
 }
