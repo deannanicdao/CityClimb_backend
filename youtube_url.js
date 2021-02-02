@@ -4,7 +4,7 @@ const getVideoId = (url) => {
 
     let url_breakdown
 
-    if (url.includes('?')) {
+    if (url.includes("?")) {
         if (url.includes('?vi=')) {
             url_breakdown = url.split('?vi=')
             url = url_breakdown[1].slice(0, 11)
@@ -34,5 +34,7 @@ const getVideoId = (url) => {
 
     return url
 }
+
+// console.log(getVideoId('https://www.youtube.com/watch?v=ChnUEX_TI2I'))
 
 export default getVideoId

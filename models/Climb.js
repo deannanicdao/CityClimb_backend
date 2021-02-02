@@ -6,17 +6,17 @@ import mongoose from 'mongoose'
 const ClimbSchema = new mongoose.Schema({
     gym: {
         type: String,
-        enum: ['milton', 'newstead', 'west end'],
-        required: true
+        enum: ['Milton', 'Newstead', 'West End'],
+        required: false
     },
     wall: {
         type: String,
-        required: true
+        required: false
     },
     colour: {
         type: String,
         enum: ['black', 'blue', 'green', 'orange', 'purple', 'red', 'white', 'yellow'],
-        required: true
+        required: false
     },
     setter: { 
         type: mongoose.Schema.Types.ObjectId, 
@@ -29,12 +29,12 @@ const ClimbSchema = new mongoose.Schema({
     image: {
         type: String,
         trim: true,
-        required: true
+        required: false
     },
     video: {
         type: String,
         trim: true,
-        required: true
+        required: false
     }
 }, { timestamps: true})
 
