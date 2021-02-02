@@ -9,6 +9,7 @@ import cors from 'cors' // allows different domains
 import productRoutes from './routes/products.js'
 import climbRoutes from './routes/climbs.js'
 import userRoutes from './routes/users.js'
+import {cloudinaryConfig } from './config/cloudinaryConfig.js'
 
 const app = express()
 app.use(cors())
@@ -25,6 +26,7 @@ app.use(
 
 // use uploads folder to save images
 app.use('/uploads', express.static('uploads')) 
+app.use('*', cloudinaryConfig)
 
 // Connect database
 connectDB()
