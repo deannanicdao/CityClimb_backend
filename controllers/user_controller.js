@@ -19,7 +19,6 @@ router.get("/", async (request, response) => {
         console.error(err.message)
         response.status(500).send('Server error')
     }
-    
 })
 
 // GET
@@ -58,8 +57,8 @@ const create = async (request, response) =>
         if (user) {
             response.status(400).json({ errors: [ { msg: 'user already exists' }] })
         }
-        uploader.upload(file,(url, err) => {
-            const image = url.url
+        uploader.upload(file,(uploadResponse, err) => {
+            const image = uploadResponse.url
             user = new User({
                 name,
                 email,
@@ -88,14 +87,14 @@ const create = async (request, response) =>
 // UPDATE
 // Update an entire user
 router.put("/:id", (request, response) => {
-    User.findOneAndReplace({ _id: request.params.id }, request.body)
+    User.findOneAndReplace({ _id: request.params.id }, request.body, { new: true })
     .then(document => response.send(document))
     .catch(error => response.send(error))
 })
 
 // Update existing fields of user
 router.patch("/:id", (request, response) => {
-    User.findByIdAndUpdate(request.params.id, request.body)
+    User.findByIdAndUpdate(request.params.id, request.body, { new: true })
         .then(document => response.send(document))
         .catch(error => response.send(error))
 })
