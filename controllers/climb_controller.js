@@ -4,8 +4,6 @@ import DatauriParser from 'datauri/parser.js'
 import path from 'path'
 import { uploader } from '../config/cloudinaryConfig.js'
 
-
-
 const create = (req, res) =>{
     console.log('Inside create')
 
@@ -20,9 +18,11 @@ const create = (req, res) =>{
 
     let video = getVideoId(youtubeUrl)
 
-    uploader.upload(file,(url, err) => {
+    uploader.upload(file,(uploadResponse, err) => {
         // console.log(1)
-        const image = url.url
+        // console.log(uploadResponse)
+        const image = `/${uploadResponse.version}/${uploadResponse.public_id}.${uploadResponse.format}`
+        // actual url is http://res.cloudinary.com/coderacademy/image/upload/${uploadResponse.version}/${uploadResponse.public_id}.${uploadResponse.format}
         let climb = new Climb({
             gym,
             wall,
@@ -31,6 +31,7 @@ const create = (req, res) =>{
             video
         })
         // console.log(2)
+        console.log(climb)
 
         climb.save((err, climb) => {
             if(err){
@@ -47,6 +48,63 @@ const create = (req, res) =>{
     })
 }
 
+
+// GET
+// Find all climbs
+const listClimbs = async (request, response) => {
+    try {
+        // console.log(request)
+        if(request.params.gym){
+            const gym = request.params.gym
+            let climbs = await Climb.find({ gym: gym})
+            if (climbs) {
+                response.send(climbs)
+            }
+        } else {
+        let climbs = await Climb.find()
+        if (climbs) {
+            response.send(climbs)
+        }
+        }
+    } catch (err) {
+        console.error(err.message)
+        response.status(500).send('Server error')
+    }
+}
+
+
+// GET
+// Find climb by id
+const readClimb = async (request, response) => {
+    try {
+        let climb = await Climb.findById(request.params.climbId)
+        if (climb) {
+            response.send(climb)
+        } else {
+            response.send('Climb not found.')
+        }
+    } catch (err) {
+        console.error(err.message)
+        response.status(500).send('Server error')
+    }
+}
+
+
+
+// PATCH method to add removal date exactly 14 days from current time 
+const addRemovalDate = (req, res) => {
+    Climb.findByIdAndUpdate(req.params.climbId, { removalDate: (Date.now() + 12096e5)}, { new: true })
+        .then(document => res.send(document))
+        .catch(error => res.send(error))
+}
+
+
+
+
+
 export default { 
-    create
+    create,
+    addRemovalDate,
+    readClimb,
+    listClimbs
 }
