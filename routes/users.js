@@ -10,6 +10,10 @@
 import express from 'express'
 import User from '../models/User.js'
 import { check, validationResult } from 'express-validator'
+import DatauriParser from 'datauri/parser.js'
+import path from 'path'
+import { uploader } from '../config/cloudinaryConfig.js'
+import upload from '../middleware/upload.js'
 const router = express.Router();
 
 // GET
@@ -46,7 +50,7 @@ router.get("/:id", async (request, response) => {
 
 // REGISTER
 // Register a new user
-router.post("/", [
+router.post("/", upload, [
     check('name', 'Name is required').notEmpty(),
     check('email', 'Please include a valid email').isEmail(),
     check('staffNumber', 'Please enter a valid staff number').isLength({ min: 6 }),
@@ -59,30 +63,39 @@ router.post("/", [
         }
         
         const { name, email, staffNumber, password } = request.body
+        const parser = new DatauriParser()
+        const fileExtension = path.extname(request.file.originalname).toString().toLowerCase()
+        const bufferContent = request.file.buffer
+        const file = parser.format(fileExtension, bufferContent).content
+        let user = await User.findOne({ name })
 
-        try {
-            let user = await User.findOne({ name })
-
-            if (user) {
-                response.status(400).json({ errors: [ { msg: 'user already exists' }] })
-            }
-
+        if (user) {
+            response.status(400).json({ errors: [ { msg: 'user already exists' }] })
+        }
+        uploader.upload(file,(url, err) => {
+            const image = url.url
             user = new User({
                 name,
                 email,
                 staffNumber,
-                password
+                password,
+                image
             })
 
-            await user.save()
-
-            response.status(201).send(user)
-        } catch (err) {
-            console.error(err.message)
-            response.status(500).send('Server error')
-        }
-    }
-)
+            console.log(image)
+            
+            user.save((err, climb) => {
+                if (err) {
+                    console.error(err.message)
+                    response.status(500).send('Server error')
+                }
+                response.status(201).json({
+                    message: "User successfully registered",
+                    user
+                })
+            })
+    })
+})
 
 // UPDATE
 // Update an entire user
