@@ -4,6 +4,8 @@ import DatauriParser from 'datauri/parser.js'
 import path from 'path'
 import { uploader } from '../config/cloudinaryConfig.js'
 
+
+
 const create = (req, res) =>{
     console.log('Inside create')
 
