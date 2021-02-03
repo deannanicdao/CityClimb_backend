@@ -14,5 +14,10 @@ router.route('/').post(upload, userCtrl.create, [
     check('password', 'Please enter a valid password with 6 or more characters').isLength({ min: 6 })
 ])
 
+router.route('/').get(userCtrl.listUsers)
+router.route('/:id').get(userCtrl.listUser)
+router.route('/:id').put(userCtrl.updateUser)
+router.route('/:id').patch(userCtrl.editUser)
+router.route('/:id').delete(userCtrl.deleteUser)
 
 export default router

@@ -9,7 +9,7 @@ const router = express.Router(); // TODO: get rid of this after refactoring othe
 
 // GET
 // Find all users
-router.get("/", async (request, response) => {
+const listUsers = async (request, response) => {
     try {
         let users = await User.find()
         if (users) {
@@ -19,11 +19,11 @@ router.get("/", async (request, response) => {
         console.error(err.message)
         response.status(500).send('Server error')
     }
-})
+}
 
 // GET
 // Find user by id
-router.get("/:id", async (request, response) => {
+const listUser = async (request, response) => {
     try {
         let user = await User.findById(request.params.id)
         if (user) {
@@ -36,7 +36,7 @@ router.get("/:id", async (request, response) => {
         response.status(500).send('Server error')
     }
    
-})
+}
 
 // REGISTER
 // Register a new user
@@ -82,33 +82,38 @@ const create = async (request, response) =>
     })
 }
 
-
-
 // UPDATE
 // Update an entire user
-router.put("/:id", (request, response) => {
+const updateUser = (request, response) => {
     User.findOneAndReplace({ _id: request.params.id }, request.body, { new: true })
     .then(document => response.send(document))
     .catch(error => response.send(error))
-})
+}
 
+// EDIT
 // Update existing fields of user
-router.patch("/:id", (request, response) => {
+const editUser = (request, response) => {
     User.findByIdAndUpdate(request.params.id, request.body, { new: true })
         .then(document => response.send(document))
         .catch(error => response.send(error))
-})
+}
 
 // DELETE
 // Remove a user
-router.delete("/:id", (request, response) => {
+const deleteUser = (request, response) => {
     User.findByIdAndDelete(request.params.id)
         .then(confirmation => response.send(console.log(confirmation)))
+        
         // TODO: Returns the deleted object - change this to return status
 		.catch(error => response.send(error))
-})
+}
 
 
 export default {
-    create
+    create,
+    listUsers,
+    listUser,
+    updateUser,
+    editUser,
+    deleteUser
 }
