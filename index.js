@@ -1,7 +1,3 @@
-// const express = require("express")
-// const { indexOf } = require("methods")
-// const connectDB = require('./config/db')
-
 import express from 'express'
 import connectDB from './config/db.js' 
 import bodyParser from 'body-parser'
@@ -30,17 +26,6 @@ app.use('*', cloudinaryConfig)
 
 // Connect database
 connectDB()
-
-// mongoose.connect(mongoURI, {
-//     useNewUrlParser: true,
-//     useUnifiedTopology: true
-// })
-// .then(() => console.log("Connected to the database"))
-// .catch(() => console.log("There was an error connecting to the database"))
-
-
-
-// Input origin
 
 
 app.use("/products", productRoutes)

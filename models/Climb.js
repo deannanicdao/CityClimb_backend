@@ -6,7 +6,7 @@ import mongoose from 'mongoose'
 const ClimbSchema = new mongoose.Schema({
     gym: {
         type: String,
-        enum: ['Milton', 'Newstead', 'West End'],
+        enum: ['milton', 'newstead', 'westend'],
         required: false
     },
     wall: {
