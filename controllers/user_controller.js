@@ -54,6 +54,7 @@ const create = async (request, response) =>
         const file = parser.format(fileExtension, bufferContent).content
         let user = await User.findOne({ name })
 
+        //TODO: merge validation_staffNumber_email branch into main
         if (user) {
             response.status(400).json({ errors: [ { msg: 'user already exists' }] })
         }
