@@ -16,7 +16,7 @@ router.route('/:gym/').get(climbCtrl.listClimbs)
 
 router.route('/:gym/:colour').get(climbCtrl.listClimbs)
 
-router.route('/:gym/:colour/:climbId').get(climbCtrl.readClimb).patch(climbCtrl.addRemovalDate)
+router.route('/:gym/:colour/:climbId').get(climbCtrl.listClimbs).patch(climbCtrl.addRemovalDate)
     
 export default router
 
