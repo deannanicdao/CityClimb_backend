@@ -29,9 +29,9 @@ const listUsers = async (request, response) => {
 // Find user by id
 const listUser = async (request, response) => {
     try {
-        let user = await User.findById(request.params.id)
+        let user = await User.findById(request.params.id).select('-password')
         if (user) {
-            response.send(user)
+            response.json(user)
         } else {
             response.send('User not found.')
         }
