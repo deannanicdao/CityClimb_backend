@@ -1,11 +1,13 @@
 import express from 'express'
 import User from '../models/User.js'
+import config from 'config'
 import { validationResult } from 'express-validator'
 import DatauriParser from 'datauri/parser.js'
 import path from 'path'
 import { uploader } from '../config/cloudinaryConfig.js'
 import bcrypt from 'bcryptjs'
 import gravatar from 'gravatar'
+import jwt from 'jsonwebtoken'
 
 
 
@@ -83,16 +85,30 @@ const create = async (request, response) =>
                 user.password = await bcrypt.hash(password, salt)
 
                 // Save user
-                await user.save((err, user) => {
-                    if (err) {
-                        console.error(err.message)
-                        response.status(500).send('Server error')
+                await user.save()
+
+                // Load a payload with user id
+                const payload = {
+                    user: {
+                        id: user.id
                     }
-                    response.status(201).json({
-                        message: "User successfully registered",
-                        user
-                    })
-                })
+                }
+
+                // Create JSON web token for auth
+                jwt.sign(
+                    payload, 
+                    config.get('jwtSecret'),
+                    { expiresIn: 360000 },
+                    (err, token) => {
+                        if (err) {
+                            console.error(err.message)
+                            response.status(500).send('Server error')
+                        }
+                        response.status(201).json({ token })
+                        console.log("User registered")
+                    }
+
+                )
             })
         }
 }
