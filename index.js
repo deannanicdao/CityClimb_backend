@@ -6,6 +6,7 @@ import productRoutes from './routes/products.js'
 import climbRoutes from './routes/climbs.js'
 import userRoutes from './routes/users.js'
 import {cloudinaryConfig } from './config/cloudinaryConfig.js'
+import { listClimbs } from './controllers/climb_controller.js'
 
 const app = express()
 app.use(cors())
@@ -32,6 +33,8 @@ app.use("/products", productRoutes)
 app.use('/climbs', climbRoutes)
 app.use("/users", userRoutes)
 
+// Get All the climbs 
+app.use("/schedule", express.Router().get('/', listClimbs))
 
 
 

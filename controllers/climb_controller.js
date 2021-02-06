@@ -8,6 +8,7 @@ const create = (req, res) => {
     console.log('Inside create')
 
     let { gym, wall, colour, youtubeUrl } = req.body
+    let removalDate = (Date.now()  + 3.1536e11)
 
     // Ensure gym value is lower case to match Schema definition 
     gym = gym.toLowerCase()
@@ -31,7 +32,8 @@ const create = (req, res) => {
             wall,
             colour,
             image,
-            video
+            video,
+            removalDate
         })
         // console.log(2)
         console.log(climb)
@@ -107,18 +109,26 @@ const listClimbs = async (request, response) => {
 
 // PATCH method to add removal date exactly 14 days from current time 
 const addRemovalDate = (req, res) => {
-    Climb.findByIdAndUpdate(req.params.climbId, { removalDate: (Date.now() + 12096e5) }, { new: true })
+    console.log('Inside: Add Removal Date')
+    Climb.findByIdAndUpdate(req.params.climbId, { removalDate: (Date.now() + 12096e5)}, { new: true })
         .then(document => res.send(document))
         .catch(error => res.send(error))
 }
 
 
 
+// const addRemovalDate = (req, res) => {
+//     console.log('Inside: Add Removal Date')
+//     Climb.findByIdAndUpdate(req.params.climbId, { removalDate: (Date.now() + 12096e5)}, { new: true })
+//         .then(document => res.send(document))
+//         .catch(error => res.send(error))
+// }
 
+export { create, listClimbs, addRemovalDate }
 
-export default {
-    create,
-    addRemovalDate,
-    // readClimb,
-    listClimbs
-}
+// export default {
+//     create,
+//     addRemovalDate,
+//     // readClimb,
+//     listClimbs
+// }

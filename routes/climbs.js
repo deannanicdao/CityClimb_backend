@@ -1,5 +1,6 @@
 import express from 'express'
-import climbCtrl from '../controllers/climb_controller.js'
+import { create, listClimbs, addRemovalDate } from '../controllers/climb_controller.js'
+// import climbCtrl from '../controllers/climb_controller.js'
 import imageUploadValidation from '../middleware/imageUploadValidation.js'
 
 // use multer from upload
@@ -8,15 +9,15 @@ import upload from '../middleware/upload.js'
 const router = express.Router()
 
 
-router.route('/').get(climbCtrl.listClimbs).post(upload, imageUploadValidation, climbCtrl.create)
-router.route('/:gym/').get(climbCtrl.listClimbs)
+router.route('/').get(listClimbs).post(upload, imageUploadValidation, create)
+router.route('/:gym/').get(listClimbs)
 
-// router.route('/:climbId/').get(climbCtrl.readClimb)
+// router.route('/:climbId/').get(readClimb)
 
 
-router.route('/:gym/:colour').get(climbCtrl.listClimbs)
+router.route('/:gym/:colour').get(listClimbs)
 
-router.route('/:gym/:colour/:climbId').get(climbCtrl.listClimbs).patch(climbCtrl.addRemovalDate)
+router.route('/:gym/:colour/:climbId').get(listClimbs).patch(addRemovalDate)
     
 export default router
 
