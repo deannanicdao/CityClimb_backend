@@ -24,7 +24,7 @@ const ClimbSchema = new mongoose.Schema({
     },
     removalDate: {
         type: Date,
-        required: false 
+        expires: 10,
     },
     image: {
         type: String,
