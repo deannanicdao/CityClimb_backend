@@ -4,7 +4,7 @@ import { validationResult } from 'express-validator'
 import DatauriParser from 'datauri/parser.js'
 import path from 'path'
 import { uploader } from '../config/cloudinaryConfig.js'
-const router = express.Router(); // TODO: get rid of this after refactoring other routes
+const { validationResult } = require('express-validator')
 
 
 // GET

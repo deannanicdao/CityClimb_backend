@@ -1,6 +1,6 @@
 import express from 'express'
 import userCtrl from '../controllers/user_controller.js'
-import { check } from 'express-validator'
+import { check, validationResult } from 'express-validator'
 
 // use multer and dataUri from upload
 import upload from '../middleware/upload.js'
