@@ -44,7 +44,7 @@ const listUser = async (request, response) => {
 
 // REGISTER
 // Register a new user
-const create = async (request, response) => 
+const createUser = async (request, response) => 
     {
         let errors = validationResult(request)
         if (!errors.isEmpty()) {
@@ -113,6 +113,61 @@ const create = async (request, response) =>
         }
 }
 
+// LOGIN
+// Login a user
+const loginUser = async (request, response) => {
+    let errors = validationResult(request)
+
+    if (!errors.isEmpty()) {
+        return response.status(400).json({ errors: errors.array() })
+    }
+    
+    // Deconstruct params from request body for validation
+    const { email, password } = request.body
+
+    // Check if user exists by email or staff number, otherwise keep the current user
+    let user = await User.findOne({ email })
+
+    // Check if user login details match users in database
+    if (!user) {
+        response
+            .status(400)
+            .json({ errors: [ { msg: 'Invalid credentials' }] })
+    }
+
+    // Check if password matches encrypted password
+    const isMatch = await bcrypt.compare(password, user.password)
+    if (!isMatch) {
+        response
+            .status(400)
+            .json({ errors: [ { msg: 'Invalid credentials' }] })
+    }
+
+    // Success route, returns a JWT
+    // Load a payload with user id
+    const payload = {
+        user: {
+            id: user.id
+        }
+    }
+
+    // Create JSON web token for auth
+    jwt.sign(
+        payload, 
+        config.get('jwtSecret'),
+        { expiresIn: 360000 },
+        (err, token) => {
+            if (err) {
+                console.error(err.message)
+                response.status(500).send('Server error')
+            }
+            response.status(201).json({ token })
+            console.log("User registered")
+        }
+
+    )
+}
+
 // UPDATE
 // Update an entire user
 const updateUser = (request, response) => {
@@ -141,7 +196,8 @@ const deleteUser = (request, response) => {
 
 
 export default {
-    create,
+    createUser,
+    loginUser,
     listUsers,
     listUser,
     updateUser,
