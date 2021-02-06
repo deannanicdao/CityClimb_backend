@@ -52,35 +52,45 @@ const create = async (request, response) =>
         const fileExtension = path.extname(request.file.originalname).toString().toLowerCase()
         const bufferContent = request.file.buffer
         const file = parser.format(fileExtension, bufferContent).content
-        let user = await User.findOne({ name })
+        let user = await User.findOne({ email })
+        console.log("This is the new request")
+        console.log(user)
 
-        //TODO: merge validation_staffNumber_email branch into main
+        user = await User.findOne({ staffNumber }) || user
+        console.log(user)
+
         if (user) {
-            response.status(400).json({ errors: [ { msg: 'user already exists' }] })
-        }
-        uploader.upload(file,(uploadResponse, err) => {
-            const image = uploadResponse.url
-            user = new User({
-                name,
-                email,
-                staffNumber,
-                password,
-                image
-            })
-
-            console.log(image)
-
-            user.save((err, climb) => {
-                if (err) {
-                    console.error(err.message)
-                    response.status(500).send('Server error')
-                }
-                response.status(201).json({
-                    message: "User successfully registered",
-                    user
+            response.status(400).json({ errors: [ { msg: 'User already exists' }] })
+        } else {
+            uploader.upload(file, (uploadResponse, err) => {
+                const image = uploadResponse.url
+                user = new User({
+                    name,
+                    email,
+                    staffNumber,
+                    password,
+                    image
+                })
+    
+                console.log(image)
+    
+                console.log("Outside user.save")
+                console.log(user)
+    
+                user.save((err, user) => {
+                    console.log("Inside user.save")
+                    console.log(user)
+                    if (err) {
+                        console.error(err.message)
+                        response.status(500).send('Server error')
+                    }
+                    response.status(201).json({
+                        message: "User successfully registered",
+                        user
+                    })
                 })
             })
-    })
+        }
 }
 
 // UPDATE
