@@ -4,7 +4,9 @@ import { validationResult } from 'express-validator'
 import DatauriParser from 'datauri/parser.js'
 import path from 'path'
 import { uploader } from '../config/cloudinaryConfig.js'
-const router = express.Router(); // TODO: get rid of this after refactoring other routes
+import bcrypt from 'bcryptjs'
+import gravatar from 'gravatar'
+
 
 
 // GET
@@ -47,22 +49,24 @@ const create = async (request, response) =>
             return response.status(400).json({ errors: errors.array() })
         }
         
+        // Deconstruct params from request body for validation
         const { name, email, staffNumber, password } = request.body
+
+        // Creating a image file with new user
         const parser = new DatauriParser()
         const fileExtension = path.extname(request.file.originalname).toString().toLowerCase()
         const bufferContent = request.file.buffer
         const file = parser.format(fileExtension, bufferContent).content
+
+        // Check if user exists by email or staff number, otherwise keep the current user
         let user = await User.findOne({ email })
-        console.log("This is the new request")
-        console.log(user)
-
         user = await User.findOne({ staffNumber }) || user
-        console.log(user)
 
+        // If user matches an existing user, the user object is no longer null and will hit the 400 status condition
         if (user) {
             response.status(400).json({ errors: [ { msg: 'User already exists' }] })
         } else {
-            uploader.upload(file, (uploadResponse, err) => {
+            uploader.upload(file, async (uploadResponse, err) => {
                 const image = uploadResponse.url
                 user = new User({
                     name,
@@ -72,14 +76,14 @@ const create = async (request, response) =>
                     image
                 })
     
-                console.log(image)
-    
-                console.log("Outside user.save")
-                console.log(user)
-    
-                user.save((err, user) => {
-                    console.log("Inside user.save")
-                    console.log(user)
+                // Set salt
+                const salt = await bcrypt.genSalt(10)
+                
+                // Hash password
+                user.password = await bcrypt.hash(password, salt)
+
+                // Save user
+                await user.save((err, user) => {
                     if (err) {
                         console.error(err.message)
                         response.status(500).send('Server error')
