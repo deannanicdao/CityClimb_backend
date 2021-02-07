@@ -24,7 +24,7 @@ const router = express.Router()
 // const User = require('../models/User');
 
 // Register a user
-router.route('/register').post(upload, userCtrl.createUser, [
+router.route('/register').post(userCtrl.createUser, [
     check('name', 'Name is required').notEmpty(),
     check('email', 'Please include a valid email').isEmail(),
     check('staffNumber', 'Please enter a valid staff number').isLength({ min: 6 }),
@@ -32,16 +32,15 @@ router.route('/register').post(upload, userCtrl.createUser, [
 ])
 
 // Login a user
-router.route('/login').post(upload, userCtrl.loginUser, [
+router.route('/login').post(userCtrl.loginUser, [
     check('email', 'Please include a valid email').isEmail(),
     check('password', 'Please enter a valid password').isLength({ min: 6 })
 ])
 
 // User token
-router.route('/').post(upload, userCtrl.loginUser, [
-    check('email', 'Please include a valid email').isEmail(),
-    check('password', 'Please enter a valid password').isLength({ min: 6 })
-])
+router.route('/').get(auth, userCtrl.loadUser)
+
+
 
 export default router
 
