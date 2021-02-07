@@ -1,5 +1,5 @@
 import express from 'express'
-import { create, listClimbs, addRemovalDate, editClimb } from '../controllers/climb_controller.js'
+import { create, listClimbs, addRemovalDate, editClimb, removeClimb } from '../controllers/climb_controller.js'
 // import climbCtrl from '../controllers/climb_controller.js'
 import imageUploadValidation from '../middleware/imageUploadValidation.js'
 
@@ -19,7 +19,7 @@ router.route('/:gym/:colour').get(listClimbs)
 
 router.route('/:gym/:colour/:climbId').get(listClimbs).patch(addRemovalDate)
 
-router.route('/:gym/:colour/:climbId/edit').patch(upload, imageUploadValidation, editClimb)
+router.route('/:gym/:colour/:climbId/edit').patch(upload, imageUploadValidation, editClimb).delete(removeClimb)
 
 export default router
 
