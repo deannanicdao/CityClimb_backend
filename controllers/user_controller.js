@@ -1,15 +1,19 @@
 import express from 'express'
 import User from '../models/User.js'
+import config from 'config'
 import { validationResult } from 'express-validator'
 import DatauriParser from 'datauri/parser.js'
 import path from 'path'
 import { uploader } from '../config/cloudinaryConfig.js'
-const router = express.Router(); // TODO: get rid of this after refactoring other routes
+import bcrypt from 'bcryptjs'
+import gravatar from 'gravatar'
+import jwt from 'jsonwebtoken'
+
 
 
 // GET
 // Find all users
-router.get("/", async (request, response) => {
+const listUsers = async (request, response) => {
     try {
         let users = await User.find()
         if (users) {
@@ -19,15 +23,15 @@ router.get("/", async (request, response) => {
         console.error(err.message)
         response.status(500).send('Server error')
     }
-})
+}
 
 // GET
 // Find user by id
-router.get("/:id", async (request, response) => {
+const listUser = async (request, response) => {
     try {
-        let user = await User.findById(request.params.id)
+        let user = await User.findById(request.params.id).select('-password')
         if (user) {
-            response.send(user)
+            response.json(user)
         } else {
             response.send('User not found.')
         }
@@ -36,11 +40,11 @@ router.get("/:id", async (request, response) => {
         response.status(500).send('Server error')
     }
    
-})
+}
 
 // REGISTER
 // Register a new user
-const create = async (request, response) => 
+const createUser = async (request, response) => 
     {
         console.log("Inside Register a new User")
         let errors = validationResult(request)
@@ -59,63 +63,152 @@ const create = async (request, response) =>
         const fileExtension = path.extname(request.file.originalname).toString().toLowerCase()
         const bufferContent = request.file.buffer
         const file = parser.format(fileExtension, bufferContent).content
-        let user = await User.findOne({ name })
 
+        // Check if user exists by email or staff number, otherwise keep the current user
+        let user = await User.findOne({ email })
+        user = await User.findOne({ staffNumber }) || user
+
+        // If user matches an existing user, the user object is no longer null and will hit the 400 status condition
         if (user) {
-            response.status(400).json({ errors: [ { msg: 'user already exists' }] })
-        }
-        uploader.upload(file,(uploadResponse, err) => {
-            const image = uploadResponse.url
-            user = new User({
-                name,
-                email,
-                staffNumber,
-                password,
-                image
-            })
+            response.status(400).json({ errors: [ { msg: 'User already exists' }] })
+        } else {
+            uploader.upload(file, async (uploadResponse, err) => {
+                const image = uploadResponse.url
+                user = new User({
+                    name,
+                    email,
+                    staffNumber,
+                    password,
+                    image
+                })
+    
+                // Set salt
+                const salt = await bcrypt.genSalt(10)
+                
+                // Hash password
+                user.password = await bcrypt.hash(password, salt)
 
-            console.log(image)
+                // Save user
+                await user.save()
 
             user.save((err, user) => {
                 if (err) {
                     console.error(err.message)
                     response.status(500).send('Server error')
+                // Load a payload with user id
+                const payload = {
+                    user: {
+                        id: user.id
+                    }
                 }
-                response.status(201).json({
-                    message: "User successfully registered",
-                    user
-                })
+
+                // Create JSON web token for auth
+                jwt.sign(
+                    payload, 
+                    config.get('jwtSecret'),
+                    { expiresIn: 360000 },
+                    (err, token) => {
+                        if (err) {
+                            console.error(err.message)
+                            response.status(500).send('Server error')
+                        }
+                        response.status(201).json({ token })
+                        console.log("User registered")
+                    }
+
+                )
             })
-    })
+        }
 }
 
+// LOGIN
+// Login a user
+const loginUser = async (request, response) => {
+    let errors = validationResult(request)
 
+    if (!errors.isEmpty()) {
+        return response.status(400).json({ errors: errors.array() })
+    }
+    
+    // Deconstruct params from request body for validation
+    const { email, password } = request.body
+
+    // Check if user exists by email or staff number, otherwise keep the current user
+    let user = await User.findOne({ email })
+
+    // Check if user login details match users in database
+    if (!user) {
+        response
+            .status(400)
+            .json({ errors: [ { msg: 'Invalid credentials' }] })
+    }
+
+    // Check if password matches encrypted password
+    const isMatch = await bcrypt.compare(password, user.password)
+    if (!isMatch) {
+        response
+            .status(400)
+            .json({ errors: [ { msg: 'Invalid credentials' }] })
+    }
+
+    // Success route, returns a JWT
+    // Load a payload with user id
+    const payload = {
+        user: {
+            id: user.id
+        }
+    }
+
+    // Create JSON web token for auth
+    jwt.sign(
+        payload, 
+        config.get('jwtSecret'),
+        { expiresIn: 360000 },
+        (err, token) => {
+            if (err) {
+                console.error(err.message)
+                response.status(500).send('Server error')
+            }
+            response.status(201).json({ token })
+            console.log("User registered")
+        }
+
+    )
+}
 
 // UPDATE
 // Update an entire user
-router.put("/:id", (request, response) => {
+const updateUser = (request, response) => {
     User.findOneAndReplace({ _id: request.params.id }, request.body, { new: true })
     .then(document => response.send(document))
     .catch(error => response.send(error))
-})
+}
 
+// EDIT
 // Update existing fields of user
-router.patch("/:id", (request, response) => {
+const editUser = (request, response) => {
     User.findByIdAndUpdate(request.params.id, request.body, { new: true })
         .then(document => response.send(document))
         .catch(error => response.send(error))
-})
+}
 
 // DELETE
 // Remove a user
-router.delete("/:id", (request, response) => {
+const deleteUser = (request, response) => {
     User.findByIdAndDelete(request.params.id)
         .then(confirmation => response.send(console.log(confirmation)))
+        
         // TODO: Returns the deleted object - change this to return status
 		.catch(error => response.send(error))
-})
+}
 
 
 export default {
-    create
+    createUser,
+    loginUser,
+    listUsers,
+    listUser,
+    updateUser,
+    editUser,
+    deleteUser
 }
