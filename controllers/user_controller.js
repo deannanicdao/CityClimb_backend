@@ -56,7 +56,7 @@ const createUser = async (request, response) =>
 
         // Creating a image file with new user
         const parser = new DatauriParser()
-        const fileExtension = path.extname(request.file.originalname).toString().toLowerCase()
+        const fileExtension = path.extname(request.file).toString().toLowerCase()
         const bufferContent = request.file.buffer
         const file = parser.format(fileExtension, bufferContent).content
 
