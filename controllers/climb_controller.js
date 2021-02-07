@@ -54,6 +54,85 @@ const create = (req, res) => {
 }
 
 
+
+// PATCH method to edit climb 
+const editClimb = (request, response) => {
+    console.log('Inside EditClimb')
+    console.log(request.body)
+    let { gym, wall, colour, youtubeUrl } = request.body
+    let climbId = request.params.climbId
+    let video = getVideoId(youtubeUrl)
+
+    const parser = new DatauriParser()
+    const fileExtension = path.extname(request.file.originalname).toString().toLowerCase()
+    const bufferContent = request.file.buffer
+    const file = parser.format(fileExtension, bufferContent).content
+
+    uploader.upload(file, (uploadResponse, err) => {
+        // console.log(1)
+        // console.log(uploadResponse)
+        const image = `/v${uploadResponse.version}/${uploadResponse.public_id}.${uploadResponse.format}`
+
+        let update = {
+            gym: gym,
+            wall: wall,
+            colour: colour,
+            image: image,
+            video: video
+        }
+
+        // console.log(2)
+        console.log(update)
+
+        Climb.findByIdAndUpdate(climbId, update, { new: true }, 
+            (err, result) => {
+                
+                if (err) {
+                    return response.status(400).json({
+                        errors: err.message
+                    })
+                }
+    
+                response.status(200).json({
+                    message: "Edited climb successfully",
+                    result
+                })
+            })
+        })
+    }
+    
+        // climb.save((err, climb) => {
+        //     if (err) {
+        //         return res.status(400).json({
+        //             errors: err.message
+        //         })
+        //     }
+
+        //     res.status(200).json({
+        //         message: "Created climb successfully",
+        //         climb
+        //     })
+        // })
+
+    // Climb.findOneAndReplace({ _id: request.params.id }, update, { new: true }, 
+    //     (err, climb) => {
+    //         if (err) {
+    //             return res.status(400).json({
+    //                 errors: err.message
+    //             })
+    //         }
+
+    //         res.status(200).json({
+    //             message: "Created climb successfully",
+    //             climb
+    //         })
+    //     })
+    // .then(document => response.send(document))
+    // .catch(error => response.send(error))
+    // }
+
+
+
 // GET
 // Find a climb or multiple climbs
 const listClimbs = async (request, response) => {
@@ -106,7 +185,6 @@ const listClimbs = async (request, response) => {
 // }
 
 
-
 // PATCH method to add removal date exactly 14 days from current time 
 const addRemovalDate = (req, res) => {
     console.log('Inside: Add Removal Date')
@@ -117,6 +195,7 @@ const addRemovalDate = (req, res) => {
 
 
 
+
 // const addRemovalDate = (req, res) => {
 //     console.log('Inside: Add Removal Date')
 //     Climb.findByIdAndUpdate(req.params.climbId, { removalDate: (Date.now() + 12096e5)}, { new: true })
@@ -124,7 +203,7 @@ const addRemovalDate = (req, res) => {
 //         .catch(error => res.send(error))
 // }
 
-export { create, listClimbs, addRemovalDate }
+export { create, listClimbs, addRemovalDate, editClimb }
 
 // export default {
 //     create,
