@@ -5,9 +5,11 @@ import cors from 'cors' // allows different domains
 import productRoutes from './routes/products.js'
 import climbRoutes from './routes/climbs.js'
 import userRoutes from './routes/users.js'
+import authRoutes from './routes/auth.js'
 import {cloudinaryConfig } from './config/cloudinaryConfig.js'
 import { listClimbs } from './controllers/climb_controller.js'
-// import { listUsers } from './controllers/user_controller.js'
+import { listUsers } from './controllers/user_controller.js'
+import path from 'path'
 
 const app = express()
 app.use(cors())
@@ -33,11 +35,14 @@ connectDB()
 app.use("/products", productRoutes)
 app.use('/climbs', climbRoutes)
 app.use("/users", userRoutes)
+app.use("/auth", authRoutes)
+// app.use('/auth', require('./routes/auth'))
+// app.use('/users', require('./routes/users'));
 
 // Get All the climbs 
 app.use("/schedule", express.Router().get('/', listClimbs))
 
-// app.use("/allUsers", express.Router().get('/', listUsers))
+app.use("/users", express.Router().get('/', listUsers))
 
 
 // GET "/"
@@ -45,7 +50,7 @@ app.use("/schedule", express.Router().get('/', listClimbs))
 app.get("/", (req, res) => {
     console.log("Root path - GET request")
     console.log(req)
-    res.send("Welcome to my first web server")
+    res.send("Landing page")
 })
 
 app.listen(8000, () => {

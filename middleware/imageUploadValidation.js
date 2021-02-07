@@ -1,6 +1,6 @@
 export default (req, res, next) => {
-    // if no file is attached skip image validation 
 
+    // if no file is attached skip image validation 
     if(!(req.file)){
         next()
     } 

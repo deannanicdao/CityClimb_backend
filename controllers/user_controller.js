@@ -1,4 +1,4 @@
-import express from 'express'
+import express, { request, response } from 'express'
 import User from '../models/User.js'
 import config from 'config'
 import { validationResult } from 'express-validator'
@@ -10,6 +10,19 @@ import gravatar from 'gravatar'
 import jwt from 'jsonwebtoken'
 
 
+// Get user token 
+const loadUser = async (request, response) => {
+    try {
+        console.log('Inside loadUser in user_controller [backend]')
+        const user = await User.findById(request.user.id).select('-password');
+        console.log(user)
+        response.json(user);
+    } catch (err) {
+        console.error(err.message);
+        response.status(500).send('Server Error');
+    }
+    
+}
 
 // GET
 // Find all users
@@ -46,23 +59,19 @@ const listUser = async (request, response) => {
 // Register a new user
 const createUser = async (request, response) => 
     {
-        console.log("Inside Register a new User")
         let errors = validationResult(request)
         if (!errors.isEmpty()) {
             return response.status(400).json({ errors: errors.array() })
         }
         
-        if (User.exists({ staffNumber: staffNumber }) || User.exists({ email: email })){
-            response.status(400).json({ errors: [ { msg: 'user already exists' }] })
-        }
-
-        console.log(request.body)
+        // Deconstruct params from request body for validation
         const { name, email, staffNumber, password } = request.body
-        
-        const parser = new DatauriParser()
-        const fileExtension = path.extname(request.file.originalname).toString().toLowerCase()
-        const bufferContent = request.file.buffer
-        const file = parser.format(fileExtension, bufferContent).content
+
+        // Creating a image file with new user
+        // const parser = new DatauriParser()
+        // const fileExtension = path.extname(request.file).toString().toLowerCase()
+        // const bufferContent = request.file.buffer
+        // const file = parser.format(fileExtension, bufferContent).content
 
         // Check if user exists by email or staff number, otherwise keep the current user
         let user = await User.findOne({ email })
@@ -72,17 +81,25 @@ const createUser = async (request, response) =>
         if (user) {
             response.status(400).json({ errors: [ { msg: 'User already exists' }] })
         } else {
-            uploader.upload(file, async (uploadResponse, err) => {
-                const image = uploadResponse.url
+            // uploader.upload(file, async (uploadResponse, err) => {
+                // const image = uploadResponse.url
+                // user = new User({
+                //     name,
+                //     email,
+                //     staffNumber,
+                //     password,
+                //     // image
+                // })
+    
+                // Set salt
+
                 user = new User({
                     name,
                     email,
                     staffNumber,
-                    password,
-                    image
+                    password
                 })
-    
-                // Set salt
+
                 const salt = await bcrypt.genSalt(10)
                 
                 // Hash password
@@ -91,10 +108,6 @@ const createUser = async (request, response) =>
                 // Save user
                 await user.save()
 
-            user.save((err, user) => {
-                if (err) {
-                    console.error(err.message)
-                    response.status(500).send('Server error')
                 // Load a payload with user id
                 const payload = {
                     user: {
@@ -117,35 +130,42 @@ const createUser = async (request, response) =>
                     }
 
                 )
-            })
+            
         }
 }
 
 // LOGIN
 // Login a user
 const loginUser = async (request, response) => {
+    console.log(request)
+    
     let errors = validationResult(request)
 
     if (!errors.isEmpty()) {
+        console.log('inside errors.isempty')
         return response.status(400).json({ errors: errors.array() })
     }
     
     // Deconstruct params from request body for validation
     const { email, password } = request.body
-
+    console.log(email, password)
     // Check if user exists by email or staff number, otherwise keep the current user
     let user = await User.findOne({ email })
 
     // Check if user login details match users in database
     if (!user) {
+        console.log('User no match')
         response
             .status(400)
             .json({ errors: [ { msg: 'Invalid credentials' }] })
     }
 
+    console.log('Before isMatch in loginUser')
     // Check if password matches encrypted password
     const isMatch = await bcrypt.compare(password, user.password)
+
     if (!isMatch) {
+        console.log('password no match')
         response
             .status(400)
             .json({ errors: [ { msg: 'Invalid credentials' }] })
@@ -170,7 +190,7 @@ const loginUser = async (request, response) => {
                 response.status(500).send('Server error')
             }
             response.status(201).json({ token })
-            console.log("User registered")
+            console.log("User logged in")
         }
 
     )
@@ -202,8 +222,12 @@ const deleteUser = (request, response) => {
 		.catch(error => response.send(error))
 }
 
+export {
+    listUsers
+}
 
 export default {
+    loadUser,
     createUser,
     loginUser,
     listUsers,
