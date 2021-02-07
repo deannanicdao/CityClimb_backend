@@ -25,7 +25,7 @@ router.route('/').post(auth, upload, userCtrl.createUser, [
     check('password', 'Please enter a valid password with 6 or more characters').isLength({ min: 6 })
 ])
 // GET all users
-router.route('/').get(auth, userCtrl.listUsers)
+router.route('/').get(userCtrl.listUsers)
 
 // GET a single user
 router.route('/:id').get(auth, userCtrl.listUser)

@@ -7,7 +7,7 @@ import climbRoutes from './routes/climbs.js'
 import userRoutes from './routes/users.js'
 import {cloudinaryConfig } from './config/cloudinaryConfig.js'
 import { listClimbs } from './controllers/climb_controller.js'
-// import { listUsers } from './controllers/user_controller.js'
+import { listUsers } from './controllers/user_controller.js'
 
 const app = express()
 app.use(cors())
@@ -37,7 +37,7 @@ app.use("/users", userRoutes)
 // Get All the climbs 
 app.use("/schedule", express.Router().get('/', listClimbs))
 
-// app.use("/allUsers", express.Router().get('/', listUsers))
+app.use("/users", express.Router().get('/', listUsers))
 
 
 // GET "/"
