@@ -42,12 +42,19 @@ router.get("/:id", async (request, response) => {
 // Register a new user
 const create = async (request, response) => 
     {
+        console.log("Inside Register a new User")
         let errors = validationResult(request)
         if (!errors.isEmpty()) {
             return response.status(400).json({ errors: errors.array() })
         }
         
+        if (User.exists({ staffNumber: staffNumber }) || User.exists({ email: email })){
+            response.status(400).json({ errors: [ { msg: 'user already exists' }] })
+        }
+
+        console.log(request.body)
         const { name, email, staffNumber, password } = request.body
+        
         const parser = new DatauriParser()
         const fileExtension = path.extname(request.file.originalname).toString().toLowerCase()
         const bufferContent = request.file.buffer
@@ -69,7 +76,7 @@ const create = async (request, response) =>
 
             console.log(image)
 
-            user.save((err, climb) => {
+            user.save((err, user) => {
                 if (err) {
                     console.error(err.message)
                     response.status(500).send('Server error')
