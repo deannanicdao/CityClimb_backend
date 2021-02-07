@@ -154,14 +154,18 @@ const loginUser = async (request, response) => {
 
     // Check if user login details match users in database
     if (!user) {
+        console.log('User no match')
         response
             .status(400)
             .json({ errors: [ { msg: 'Invalid credentials' }] })
     }
 
+    console.log('Before isMatch in loginUser')
     // Check if password matches encrypted password
     const isMatch = await bcrypt.compare(password, user.password)
+
     if (!isMatch) {
+        console.log('password no match')
         response
             .status(400)
             .json({ errors: [ { msg: 'Invalid credentials' }] })
@@ -186,7 +190,7 @@ const loginUser = async (request, response) => {
                 response.status(500).send('Server error')
             }
             response.status(201).json({ token })
-            console.log("User registered")
+            console.log("User logged in")
         }
 
     )
