@@ -8,18 +8,21 @@ const create = (req, res) => {
     console.log('Inside create')
 
     let { gym, wall, colour, youtubeUrl } = req.body
+    console.log(gym, wall, colour, youtubeUrl)
     let removalDate = (Date.now()  + 3.1536e11)
 
     // Ensure gym value is lower case to match Schema definition 
     gym = gym.toLowerCase()
 
     const parser = new DatauriParser()
+    console.log(1)
     const fileExtension = path.extname(req.file.originalname).toString().toLowerCase()
     const bufferContent = req.file.buffer
     const file = parser.format(fileExtension, bufferContent).content
     // console.log(file)
 
     let video = getVideoId(youtubeUrl)
+    console.log(video)
 
     uploader.upload(file, (uploadResponse, err) => {
         // console.log(1)
@@ -189,13 +192,25 @@ const listClimbs = async (request, response) => {
 const addRemovalDate = (req, res) => {
     console.log('Inside: Add Removal Date')
     Climb.findByIdAndUpdate(req.params.climbId, { removalDate: (Date.now() + 12096e5)}, { new: true })
-        .then(document => res.send(document))
+        .then(climb => res.status(200).send(climb))
         .catch(error => res.send(error))
 }
 
 
+// DELETE method to remove climb immediately
+const removeClimb = (req, res) => {
+    console.log('Inside: removeClimb')
+    Climb.findByIdAndDelete(req.params.climbId)
+    .then(confirmation => res.status(200).json({message: "Climb Deleted", confirmation}))
+    .catch(error => res.send(error))
+}
 
-
+// router.delete("/:id", (request, response) => {
+//     Product.findByIdAndDelete(request.params.id)
+//         .then(confirmation => response.send(console.log(confirmation)))
+//         // TODO: Returns the deleted object - change this to return status
+// 		.catch(error => response.send(error))
+// })
 // const addRemovalDate = (req, res) => {
 //     console.log('Inside: Add Removal Date')
 //     Climb.findByIdAndUpdate(req.params.climbId, { removalDate: (Date.now() + 12096e5)}, { new: true })
@@ -203,7 +218,7 @@ const addRemovalDate = (req, res) => {
 //         .catch(error => res.send(error))
 // }
 
-export { create, listClimbs, addRemovalDate, editClimb }
+export { create, listClimbs, addRemovalDate, editClimb, removeClimb }
 
 // export default {
 //     create,
@@ -211,3 +226,4 @@ export { create, listClimbs, addRemovalDate, editClimb }
 //     // readClimb,
 //     listClimbs
 // }
+//
