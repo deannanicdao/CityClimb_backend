@@ -218,7 +218,9 @@ const deleteUser = (request, response) => {
 		.catch(error => response.send(error))
 }
 
-export {listUsers}
+export {
+    listUsers
+}
 
 export default {
     loadUser,

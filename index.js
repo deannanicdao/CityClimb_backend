@@ -8,6 +8,7 @@ import userRoutes from './routes/users.js'
 import authRoutes from './routes/auth.js'
 import {cloudinaryConfig } from './config/cloudinaryConfig.js'
 import { listClimbs } from './controllers/climb_controller.js'
+import { listUsers } from './controllers/user_controller.js'
 import path from 'path'
 
 const app = express()
