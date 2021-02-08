@@ -1,5 +1,5 @@
 import Climb from '../models/Climb.js'
-import getVideoId from '../youtube_url.js'
+import getYoutubeId from '../helpers/extract_youtubeID.js'
 import DatauriParser from 'datauri/parser.js'
 import path from 'path'
 import { uploader } from '../config/cloudinaryConfig.js'
@@ -10,28 +10,27 @@ const create = (req, res) => {
     let { gym, wall, colour, youtubeUrl } = req.body
     console.log(gym, wall, colour, youtubeUrl)
 
-    
+    // Set removalDate to 10 years. Puts removalDate in document so it can be updated when needed 
     let removalDate = (Date.now()  + 3.1536e11)
 
-    // Ensure gym value is lower case to match Schema definition 
-    gym = gym.toLowerCase()
-
-    const parser = new DatauriParser()
-    console.log(1)
-    const fileExtension = path.extname(req.file.originalname).toString().toLowerCase()
-    const bufferContent = req.file.buffer
-    const file = parser.format(fileExtension, bufferContent).content
+    // Get the image's file extension and it's data in buffer form and
+    // parse as a base64 data URI string
+    // example output: data:image/jpeg;base64,/9j/4AAQSkZJRgABA...
+    const file = new DatauriParser().format(path.extname(req.file.originalname).toString().toLowerCase(),req.file.buffer).content
     // console.log(file)
+    // Set video to the youtube ID. On the front end we only need the 11 character id to embed the video
+    let video = getYoutubeId(youtubeUrl)
+    // console.log(video)
 
-    let video = getVideoId(youtubeUrl)
-    console.log(video)
 
     uploader.upload(file, (uploadResponse, err) => {
-        // console.log(1)
-        // console.log(uploadResponse)
+    
+        // fronted usage of image url is in format 
+        // http://res.cloudinary.com/coderacademy/image/upload/${uploadResponse.version}/${uploadResponse.public_id}.${uploadResponse.format}
+        // So setting image to string with this value decreases the size of document in the database
         const image = `/v${uploadResponse.version}/${uploadResponse.public_id}.${uploadResponse.format}`
-
-        // actual url is http://res.cloudinary.com/coderacademy/image/upload/${uploadResponse.version}/${uploadResponse.public_id}.${uploadResponse.format}
+        // console.log(image)
+        
         let climb = new Climb({
             gym,
             wall,
@@ -40,12 +39,12 @@ const create = (req, res) => {
             video,
             removalDate
         })
-        // console.log(2)
         console.log(climb)
 
         climb.save((err, climb) => {
             if (err) {
                 return res.status(400).json({
+                    
                     errors: err.message
                 })
             }
@@ -61,21 +60,18 @@ const create = (req, res) => {
 
 
 // PATCH method to edit climb 
-const editClimb = (request, response) => {
+const editClimb = (req, res) => {
     console.log('Inside EditClimb')
-    console.log(request.body)
-    let { gym, wall, colour, youtubeUrl } = request.body
-    let climbId = request.params.climbId
-    let video = getVideoId(youtubeUrl)
 
-    const parser = new DatauriParser()
-    const fileExtension = path.extname(request.file.originalname).toString().toLowerCase()
-    const bufferContent = request.file.buffer
-    const file = parser.format(fileExtension, bufferContent).content
+    let { gym, wall, colour, youtubeUrl } = req.body
+    let climbId = req.params.climbId
+
+    let video = getYoutubeId(youtubeUrl)
+
+    const file = new DatauriParser().format(path.extname(req.file.originalname).toString().toLowerCase(),req.file.buffer).content
 
     uploader.upload(file, (uploadResponse, err) => {
-        // console.log(1)
-        // console.log(uploadResponse)
+
         const image = `/v${uploadResponse.version}/${uploadResponse.public_id}.${uploadResponse.format}`
 
         let update = {
@@ -86,19 +82,18 @@ const editClimb = (request, response) => {
             video: video
         }
 
-        // console.log(2)
         console.log(update)
 
         Climb.findByIdAndUpdate(climbId, update, { new: true }, 
             (err, result) => {
                 
                 if (err) {
-                    return response.status(400).json({
+                    return res.status(400).json({
                         errors: err.message
                     })
                 }
     
-                response.status(200).json({
+                res.status(200).json({
                     message: "Edited climb successfully",
                     result
                 })
@@ -108,35 +103,34 @@ const editClimb = (request, response) => {
     
 // GET
 // Find a climb or multiple climbs
-const listClimbs = async (request, response) => {
+const listClimbs = async (req, res) => {
     try {
         let climbs
         // Return a single climb
-        if (request.params.climbId) {
-            climbs = await Climb.findById(request.params.climbId)
+        if (req.params.climbId) {
+            climbs = await Climb.findById(req.params.climbId)
         } 
         // Return a list of climbs in the gym that are a specific colour
-        else if (request.params.gym && request.params.colour) {
-            console.log(request.params)
-            // console.log(request.params.colour)
-            const gym = request.params.gym
-            const colour = request.params.colour
+        else if (req.params.gym && req.params.colour) {
+            console.log(req.params)
+            const gym = req.params.gym
+            const colour = req.params.colour
             climbs = await Climb.find({ gym: gym, colour: colour })
         } 
         // Return all climbs in a gym 
-        else if (request.params.gym) {
-            const gym = request.params.gym
+        else if (req.params.gym) {
+            const gym = req.params.gym
             climbs = await Climb.find({ gym: gym })
         } 
         // Return all climbs 
         else {
             climbs = await Climb.find()
         }
-        response.send(climbs)
+        res.send(climbs)
 
     } catch (err) {
         console.error(err.message)
-        response.status(500).send('Server error')
+        res.status(500).send('Server error')
     }
 }
 
