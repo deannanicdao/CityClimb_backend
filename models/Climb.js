@@ -1,6 +1,3 @@
-// const mongoose = require("mongoose")
-// const User = require("./User")
-
 import mongoose from 'mongoose'
 
 const ClimbSchema = new mongoose.Schema({
@@ -18,10 +15,6 @@ const ClimbSchema = new mongoose.Schema({
         enum: ['black', 'blue', 'green', 'orange', 'purple', 'red', 'white', 'yellow'],
         required: false
     },
-    setter: { 
-        type: mongoose.Schema.Types.ObjectId, 
-        ref: "User" 
-    },
     removalDate: {
         type: Date,
         expires: 10,
@@ -38,8 +31,6 @@ const ClimbSchema = new mongoose.Schema({
     }
 }, { timestamps: true})
 
-
-// module.exports = Climb = mongoose.model('Climb', ClimbSchema)
 
 const Climb = mongoose.model('Climb', ClimbSchema)
 

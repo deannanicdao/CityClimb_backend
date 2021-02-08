@@ -1,5 +1,5 @@
 import Climb from '../models/Climb.js'
-import getVideoId from '../youtube_url.js'
+import getYoutubeId from '../helpers/extract_youtubeID.js'
 import DatauriParser from 'datauri/parser.js'
 import path from 'path'
 import { uploader } from '../config/cloudinaryConfig.js'
@@ -10,28 +10,26 @@ const create = (req, res) => {
     let { gym, wall, colour, youtubeUrl } = req.body
     console.log(gym, wall, colour, youtubeUrl)
 
-    
+    // Set removalDate to 10 years. Puts removalDate in document so it can be updated when needed 
     let removalDate = (Date.now()  + 3.1536e11)
 
-    // Ensure gym value is lower case to match Schema definition 
-    gym = gym.toLowerCase()
+    // Get the image's file extension and it's data in buffer form and
+    // parse as a base64 data URI string
+    // example output: data:image/jpeg;base64,/9j/4AAQSkZJRgABA...
+    const file = new DatauriParser().format(path.extname(req.file.originalname).toString().toLowerCase(),req.file.buffer).content
 
-    const parser = new DatauriParser()
-    console.log(1)
-    const fileExtension = path.extname(req.file.originalname).toString().toLowerCase()
-    const bufferContent = req.file.buffer
-    const file = parser.format(fileExtension, bufferContent).content
-    // console.log(file)
+    // Set video to the youtube ID. On the front end we only need the 11 character id to embed the video
+    let video = getYoutubeId(youtubeUrl)
 
-    let video = getVideoId(youtubeUrl)
-    console.log(video)
 
     uploader.upload(file, (uploadResponse, err) => {
-        // console.log(1)
-        // console.log(uploadResponse)
+    
+        // fronted usage of image url is in format 
+        // http://res.cloudinary.com/coderacademy/image/upload/${uploadResponse.version}/${uploadResponse.public_id}.${uploadResponse.format}
+        // So setting image to string with this value decreases the size of document in the database
         const image = `/v${uploadResponse.version}/${uploadResponse.public_id}.${uploadResponse.format}`
 
-        // actual url is http://res.cloudinary.com/coderacademy/image/upload/${uploadResponse.version}/${uploadResponse.public_id}.${uploadResponse.format}
+        
         let climb = new Climb({
             gym,
             wall,
@@ -40,8 +38,6 @@ const create = (req, res) => {
             video,
             removalDate
         })
-        // console.log(2)
-        console.log(climb)
 
         climb.save((err, climb) => {
             if (err) {
@@ -63,19 +59,16 @@ const create = (req, res) => {
 // PATCH method to edit climb 
 const editClimb = (request, response) => {
     console.log('Inside EditClimb')
-    console.log(request.body)
+
     let { gym, wall, colour, youtubeUrl } = request.body
     let climbId = request.params.climbId
-    let video = getVideoId(youtubeUrl)
 
-    const parser = new DatauriParser()
-    const fileExtension = path.extname(request.file.originalname).toString().toLowerCase()
-    const bufferContent = request.file.buffer
-    const file = parser.format(fileExtension, bufferContent).content
+    let video = getYoutubeId(youtubeUrl)
+
+    const file = new DatauriParser().format(path.extname(req.file.originalname).toString().toLowerCase(),req.file.buffer).content
 
     uploader.upload(file, (uploadResponse, err) => {
-        // console.log(1)
-        // console.log(uploadResponse)
+
         const image = `/v${uploadResponse.version}/${uploadResponse.public_id}.${uploadResponse.format}`
 
         let update = {
@@ -86,7 +79,6 @@ const editClimb = (request, response) => {
             video: video
         }
 
-        // console.log(2)
         console.log(update)
 
         Climb.findByIdAndUpdate(climbId, update, { new: true }, 
@@ -118,7 +110,6 @@ const listClimbs = async (request, response) => {
         // Return a list of climbs in the gym that are a specific colour
         else if (request.params.gym && request.params.colour) {
             console.log(request.params)
-            // console.log(request.params.colour)
             const gym = request.params.gym
             const colour = request.params.colour
             climbs = await Climb.find({ gym: gym, colour: colour })
