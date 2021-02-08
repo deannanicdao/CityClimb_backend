@@ -1,6 +1,5 @@
 // Returns the 11 character video ID from a youtube url 
-
-const getVideoId = (url) => {
+const getYoutubeId = (url) => {
 
     let url_breakdown
 
@@ -35,6 +34,4 @@ const getVideoId = (url) => {
     return url
 }
 
-// console.log(getVideoId('https://www.youtube.com/watch?v=ChnUEX_TI2I'))
-
-export default getVideoId
+export default getYoutubeId

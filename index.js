@@ -2,7 +2,6 @@ import express from 'express'
 import connectDB from './config/db.js' 
 import bodyParser from 'body-parser'
 import cors from 'cors' // allows different domains
-import productRoutes from './routes/products.js'
 import climbRoutes from './routes/climbs.js'
 import userRoutes from './routes/users.js'
 import authRoutes from './routes/auth.js'
@@ -24,15 +23,12 @@ app.use(
     })
 )
 
-// use uploads folder to save images
-app.use('/uploads', express.static('uploads')) 
+// load cloudinary configuration
 app.use('*', cloudinaryConfig)
 
 // Connect database
 connectDB()
 
-
-app.use("/products", productRoutes)
 app.use('/climbs', climbRoutes)
 app.use("/users", userRoutes)
 app.use("/auth", authRoutes)
@@ -42,6 +38,7 @@ app.use("/auth", authRoutes)
 // Get All the climbs 
 app.use("/schedule", express.Router().get('/', listClimbs))
 
+// Get All the users
 app.use("/users", express.Router().get('/', listUsers))
 
 
@@ -53,6 +50,7 @@ app.get("/", (req, res) => {
     res.send("Landing page")
 })
 
+// Development Server Port
 app.listen(8000, () => {
     console.log("listening to the server")
 })
