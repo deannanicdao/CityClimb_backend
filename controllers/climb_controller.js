@@ -17,9 +17,10 @@ const create = (req, res) => {
     // parse as a base64 data URI string
     // example output: data:image/jpeg;base64,/9j/4AAQSkZJRgABA...
     const file = new DatauriParser().format(path.extname(req.file.originalname).toString().toLowerCase(),req.file.buffer).content
-
+    // console.log(file)
     // Set video to the youtube ID. On the front end we only need the 11 character id to embed the video
     let video = getYoutubeId(youtubeUrl)
+    // console.log(video)
 
 
     uploader.upload(file, (uploadResponse, err) => {
@@ -28,7 +29,7 @@ const create = (req, res) => {
         // http://res.cloudinary.com/coderacademy/image/upload/${uploadResponse.version}/${uploadResponse.public_id}.${uploadResponse.format}
         // So setting image to string with this value decreases the size of document in the database
         const image = `/v${uploadResponse.version}/${uploadResponse.public_id}.${uploadResponse.format}`
-
+        // console.log(image)
         
         let climb = new Climb({
             gym,
@@ -38,10 +39,12 @@ const create = (req, res) => {
             video,
             removalDate
         })
+        console.log(climb)
 
         climb.save((err, climb) => {
             if (err) {
                 return res.status(400).json({
+                    
                     errors: err.message
                 })
             }
@@ -57,11 +60,11 @@ const create = (req, res) => {
 
 
 // PATCH method to edit climb 
-const editClimb = (request, response) => {
+const editClimb = (req, res) => {
     console.log('Inside EditClimb')
 
-    let { gym, wall, colour, youtubeUrl } = request.body
-    let climbId = request.params.climbId
+    let { gym, wall, colour, youtubeUrl } = req.body
+    let climbId = req.params.climbId
 
     let video = getYoutubeId(youtubeUrl)
 
@@ -85,12 +88,12 @@ const editClimb = (request, response) => {
             (err, result) => {
                 
                 if (err) {
-                    return response.status(400).json({
+                    return res.status(400).json({
                         errors: err.message
                     })
                 }
     
-                response.status(200).json({
+                res.status(200).json({
                     message: "Edited climb successfully",
                     result
                 })
@@ -100,34 +103,34 @@ const editClimb = (request, response) => {
     
 // GET
 // Find a climb or multiple climbs
-const listClimbs = async (request, response) => {
+const listClimbs = async (req, res) => {
     try {
         let climbs
         // Return a single climb
-        if (request.params.climbId) {
-            climbs = await Climb.findById(request.params.climbId)
+        if (req.params.climbId) {
+            climbs = await Climb.findById(req.params.climbId)
         } 
         // Return a list of climbs in the gym that are a specific colour
-        else if (request.params.gym && request.params.colour) {
-            console.log(request.params)
-            const gym = request.params.gym
-            const colour = request.params.colour
+        else if (req.params.gym && req.params.colour) {
+            console.log(req.params)
+            const gym = req.params.gym
+            const colour = req.params.colour
             climbs = await Climb.find({ gym: gym, colour: colour })
         } 
         // Return all climbs in a gym 
-        else if (request.params.gym) {
-            const gym = request.params.gym
+        else if (req.params.gym) {
+            const gym = req.params.gym
             climbs = await Climb.find({ gym: gym })
         } 
         // Return all climbs 
         else {
             climbs = await Climb.find()
         }
-        response.send(climbs)
+        res.send(climbs)
 
     } catch (err) {
         console.error(err.message)
-        response.status(500).send('Server error')
+        res.status(500).send('Server error')
     }
 }
 
