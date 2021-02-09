@@ -1,9 +1,6 @@
-// const mongoose = require('mongoose')
 import mongoose from 'mongoose'
 import dotenv from 'dotenv'
 
-// config package used for global variables
-// const config = require('config')
 import config from 'config'
 
 dotenv.config()
@@ -26,4 +23,3 @@ const connectDB = async () => {
 }
 
 export default connectDB
-// module.exports = connectDB
