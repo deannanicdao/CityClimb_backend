@@ -1,5 +1,4 @@
 .env
 node_modules/
-config/production.json
 config/default.json
 .env
