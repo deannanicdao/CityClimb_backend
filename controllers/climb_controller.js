@@ -138,7 +138,7 @@ const listClimbs = async (req, res) => {
 // PATCH method to add removal date exactly 14 days (12096e5) from current time 
 const addRemovalDate = (req, res) => {
     console.log('Inside: Add Removal Date')
-    Climb.findByIdAndUpdate(req.params.climbId, { removalDate: (Date.now() + 100)}, { new: true })
+    Climb.findByIdAndUpdate(req.params.climbId, { removalDate: (Date.now() + 12096e5)}, { new: true })
         .then(climb => res.status(200).send(climb))
         .catch(error => res.send(error))
 }
