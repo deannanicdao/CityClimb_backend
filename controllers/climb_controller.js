@@ -7,8 +7,8 @@ import { uploader } from '../config/cloudinaryConfig.js'
 const create = (req, res) => {
     console.log('Inside create')
 
-    let { gym, wall, colour, youtubeUrl } = req.body
-    console.log(gym, wall, colour, youtubeUrl)
+    let { gym, title, colour, youtubeUrl } = req.body
+    console.log(gym, title, colour, youtubeUrl)
 
     // Set removalDate to 10 years. Puts removalDate in document so it can be updated when needed 
     let removalDate = (Date.now()  + 3.1536e11)
@@ -17,10 +17,10 @@ const create = (req, res) => {
     // parse as a base64 data URI string
     // example output: data:image/jpeg;base64,/9j/4AAQSkZJRgABA...
     const file = new DatauriParser().format(path.extname(req.file.originalname).toString().toLowerCase(),req.file.buffer).content
-    // console.log(file)
+
     // Set video to the youtube ID. On the front end we only need the 11 character id to embed the video
     let video = getYoutubeId(youtubeUrl)
-    // console.log(video)
+
 
 
     uploader.upload(file, (uploadResponse, err) => {
@@ -33,7 +33,7 @@ const create = (req, res) => {
         
         let climb = new Climb({
             gym,
-            wall,
+            title,
             colour,
             image,
             video,
@@ -63,7 +63,7 @@ const create = (req, res) => {
 const editClimb = (req, res) => {
     console.log('Inside EditClimb')
 
-    let { gym, wall, colour, youtubeUrl } = req.body
+    let { gym, title, colour, youtubeUrl } = req.body
     let climbId = req.params.climbId
 
     let video = getYoutubeId(youtubeUrl)
@@ -76,7 +76,7 @@ const editClimb = (req, res) => {
 
         let update = {
             gym: gym,
-            wall: wall,
+            title: title,
             colour: colour,
             image: image,
             video: video
@@ -135,10 +135,10 @@ const listClimbs = async (req, res) => {
 }
 
 
-// PATCH method to add removal date exactly 14 days from current time 
+// PATCH method to add removal date exactly 14 days (12096e5) from current time 
 const addRemovalDate = (req, res) => {
     console.log('Inside: Add Removal Date')
-    Climb.findByIdAndUpdate(req.params.climbId, { removalDate: (Date.now() + 12096e5)}, { new: true })
+    Climb.findByIdAndUpdate(req.params.climbId, { removalDate: (Date.now() + 100)}, { new: true })
         .then(climb => res.status(200).send(climb))
         .catch(error => res.send(error))
 }

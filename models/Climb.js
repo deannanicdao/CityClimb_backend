@@ -1,19 +1,21 @@
-    import mongoose from 'mongoose'
+import mongoose from 'mongoose'
 
 const ClimbSchema = new mongoose.Schema({
     gym: {
         type: String,
         enum: ['milton', 'newstead', 'westend'],
-        required: false
+        required: true
     },
-    wall: {
+    title: {
         type: String,
-        required: false
+        required: true,
+        maxLength: 24,
+        trim: true
     },
     colour: {
         type: String,
         enum: ['black', 'blue', 'green', 'orange', 'purple', 'red', 'white', 'yellow'],
-        required: false
+        required: true
     },
     removalDate: {
         type: Date,
@@ -22,12 +24,12 @@ const ClimbSchema = new mongoose.Schema({
     image: {
         type: String,
         trim: true,
-        required: false
+        required: true
     },
     video: {
         type: String,
         trim: true,
-        required: false
+        required: true
     }
 }, { timestamps: true})
 
