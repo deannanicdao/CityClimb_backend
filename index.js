@@ -60,6 +60,7 @@ app.get("/", (req, res) => {
 })
 
 app.listen(PORT, () => {
+    console.log(PORT)
     console.log("listening to the server")
 })
 
@@ -68,3 +69,4 @@ app.use((req, res) => {
         errors: "page not found"
     })
 })
+

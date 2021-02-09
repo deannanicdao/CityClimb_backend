@@ -6,7 +6,6 @@ import DatauriParser from 'datauri/parser.js'
 import path from 'path'
 import { uploader } from '../config/cloudinaryConfig.js'
 import bcrypt from 'bcryptjs'
-import gravatar from 'gravatar'
 import jwt from 'jsonwebtoken'
 
 
@@ -175,7 +174,8 @@ const loginUser = async (request, response) => {
     // Load a payload with user id
     const payload = {
         user: {
-            id: user.id
+            id: user.id,
+            admin: user.admin
         }
     }
 
@@ -189,9 +189,17 @@ const loginUser = async (request, response) => {
                 console.error(err.message)
                 response.status(500).send('Server error')
             }
-            response.status(201).json({ token })
+            response.status(201).json({ 
+                token,
+                user: {
+                    id: user.id,
+                    admin: user.admin
+                }
+            })
             console.log("User logged in")
-        }
+            console.log(user)
+            console.log(admin)
+        },
 
     )
 }
