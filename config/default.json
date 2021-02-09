@@ -1,4 +1,6 @@
 {
   "mongoURI": "mongodb+srv://Admin:z590zf3wk8iHWGdt@cityclimb.8vbtl.mongodb.net/dbOne?retryWrites=true&w=majority",
-  "jwtSecret": "mysecrettoken"
+  "jwtSecret": "mysecrettoken",
+  "BACKEND_URL": "http://localhost:8000/",
+  "FRONTEND_URL": "http://localhost:3000/"
 }

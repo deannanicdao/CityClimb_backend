@@ -1,12 +1,13 @@
 // const mongoose = require('mongoose')
 import mongoose from 'mongoose'
+import dotenv from 'dotenv'
 
 // config package used for global variables
 // const config = require('config')
 import config from 'config'
+
+dotenv.config()
 const db = config.get('mongoURI')
-
-
 
 const connectDB = async () => {
     try {
